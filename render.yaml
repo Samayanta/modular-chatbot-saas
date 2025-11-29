@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database with pgvector
   - type: pserv
     name: chatbot-postgres
-    runtime: docker
+    env: docker
     plan: free
     dockerfilePath: ./Dockerfile.postgres
     envVars:
@@ -16,7 +16,7 @@ services:
   # Redis for BullMQ
   - type: pserv
     name: chatbot-redis
-    runtime: docker
+    env: docker
     plan: free
     dockerCommand: redis-server --appendonly yes
     image:
@@ -25,7 +25,7 @@ services:
   # REST API Server
   - type: web
     name: chatbot-api
-    runtime: docker
+    env: docker
     plan: free
     dockerfilePath: ./Dockerfile.api
     healthCheckPath: /health
@@ -65,7 +65,7 @@ services:
   # Message Processor Worker
   - type: worker
     name: chatbot-processor
-    runtime: docker
+    env: docker
     plan: free
     dockerfilePath: ./Dockerfile.processor
     envVars:
@@ -100,7 +100,7 @@ services:
   # Frontend Web App
   - type: web
     name: chatbot-frontend
-    runtime: docker
+    env: docker
     plan: free
     dockerfilePath: ./Dockerfile.frontend
     healthCheckPath: /
