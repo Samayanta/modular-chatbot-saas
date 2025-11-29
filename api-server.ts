@@ -30,7 +30,7 @@ app.use(cors());
 app.use(express.json());
 
 // Auth Middleware
-interface AuthRequest extends Request {
+interface AuthRequest extends express.Request {
     userId?: string;
 }
 
