@@ -1,0 +1,9 @@
+# Use pgvector image
+FROM pgvector/pgvector:pg17
+
+# Copy initialization script
+COPY database/schema.sql /docker-entrypoint-initdb.d/
+
+# Set environment defaults
+ENV POSTGRES_DB=chatbot_saas
+ENV POSTGRES_USER=postgres

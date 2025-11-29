@@ -1,0 +1,119 @@
+services:
+  # PostgreSQL Database with pgvector
+  - type: pserv
+    name: chatbot-postgres
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.postgres
+    envVars:
+      - key: POSTGRES_DB
+        value: chatbot_saas
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Redis for BullMQ
+  - type: pserv
+    name: chatbot-redis
+    runtime: docker
+    plan: free
+    dockerCommand: redis-server --appendonly yes
+    image:
+      url: redis:7-alpine
+    disk:
+      name: redis-data
+      mountPath: /data
+      sizeGB: 1
+
+  # REST API Server
+  - type: web
+    name: chatbot-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.api
+    healthCheckPath: /health
+    envVars:
+      - key: POSTGRES_HOST
+        fromService:
+          type: pserv
+          name: chatbot-postgres
+          property: host
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: chatbot_saas
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        fromService:
+          type: pserv
+          name: chatbot-postgres
+          envVarKey: POSTGRES_PASSWORD
+      - key: REDIS_HOST
+        fromService:
+          type: pserv
+          name: chatbot-redis
+          property: host
+      - key: REDIS_PORT
+        value: 6379
+      - key: API_PORT
+        value: 3001
+      - key: PORT
+        value: 4000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+
+  # Message Processor Worker
+  - type: worker
+    name: chatbot-processor
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.processor
+    envVars:
+      - key: POSTGRES_HOST
+        fromService:
+          type: pserv
+          name: chatbot-postgres
+          property: host
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: chatbot_saas
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        fromService:
+          type: pserv
+          name: chatbot-postgres
+          envVarKey: POSTGRES_PASSWORD
+      - key: REDIS_HOST
+        fromService:
+          type: pserv
+          name: chatbot-redis
+          property: host
+      - key: REDIS_PORT
+        value: "6379"
+      - key: PORT
+        value: "4000"
+      - key: NODE_ENV
+        value: production
+
+  # Frontend Web App
+  - type: web
+    name: chatbot-frontend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.frontend
+    healthCheckPath: /
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://chatbot-api.onrender.com
+      - key: NODE_ENV
+        value: production
