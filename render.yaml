@@ -12,10 +12,6 @@ services:
         value: postgres
       - key: POSTGRES_PASSWORD
         generateValue: true
-    disk:
-      name: postgres-data
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
 
   # Redis for BullMQ
   - type: pserv
@@ -25,10 +21,6 @@ services:
     dockerCommand: redis-server --appendonly yes
     image:
       url: redis:7-alpine
-    disk:
-      name: redis-data
-      mountPath: /data
-      sizeGB: 1
 
   # REST API Server
   - type: web
