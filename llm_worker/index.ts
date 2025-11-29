@@ -109,6 +109,14 @@ async function callLLM(prompt: string): Promise<LLMResponse> {
             intent: "general_chat",
             response: responseText || "I'm here to help! How can I assist you?"
         };
+    } catch (error) {
+        console.error('[LLM] Ollama API error:', error);
+        // Return fallback response on error
+        return {
+            language: "English",
+            intent: "error",
+            response: "I'm having trouble processing your request right now. Please try again."
+        };
     }
 }
 
