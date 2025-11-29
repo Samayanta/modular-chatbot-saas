@@ -54,12 +54,13 @@ services:
     plan: free
     repo: https://github.com/Samayanta/modular-chatbot-saas
     dockerfilePath: ./Dockerfile.frontend
-    healthCheckPath: /
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://chatbot-api.onrender.com
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "10000"
 
   # Redis for BullMQ
   - type: keyvalue
