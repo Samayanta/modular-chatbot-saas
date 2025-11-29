@@ -132,8 +132,8 @@ export default function WebWidgetPage() {
                             <span className="text-sm text-gray-600">Status:</span>
                             <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${selectedAgent.status === 'active'
-                                        ? 'bg-green-100 text-green-700'
-                                        : 'bg-gray-100 text-gray-700'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-700'
                                     }`}
                             >
                                 {selectedAgent.status}
@@ -645,8 +645,8 @@ function WidgetPreview({ agent, config, isVisible }: WidgetPreviewProps) {
                                     >
                                         <div
                                             className={`max-w-[75%] rounded-2xl px-4 py-2 ${message.sender === 'user'
-                                                    ? 'text-white'
-                                                    : 'bg-gray-100 text-gray-900'
+                                                ? 'text-white'
+                                                : 'bg-gray-100 text-gray-900'
                                                 }`}
                                             style={
                                                 message.sender === 'user'
@@ -656,8 +656,8 @@ function WidgetPreview({ agent, config, isVisible }: WidgetPreviewProps) {
                                         >
                                             <p className="text-sm">{message.text}</p>
                                             <p className={`text-xs mt-1 ${message.sender === 'user'
-                                                    ? 'text-white text-opacity-75'
-                                                    : 'text-gray-500'
+                                                ? 'text-white text-opacity-75'
+                                                : 'text-gray-500'
                                                 }`}>
                                                 {message.timestamp.toLocaleTimeString([], {
                                                     hour: '2-digit',
@@ -690,7 +690,7 @@ function WidgetPreview({ agent, config, isVisible }: WidgetPreviewProps) {
                                         onKeyPress={handleKeyPress}
                                         placeholder={config.placeholder}
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                                        style={{ focusRingColor: config.primaryColor }}
+                                        style={{ '--tw-ring-color': config.primaryColor } as React.CSSProperties}
                                     />
                                     <button
                                         onClick={handleSendMessage}
