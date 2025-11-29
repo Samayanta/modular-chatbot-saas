@@ -33,4 +33,4 @@ COPY database ./database
 EXPOSE 3001
 
 # Start API server
-CMD ["node_modules/.bin/ts-node", "api-server.ts"]
+CMD ["npm", "run", "start:api"]
