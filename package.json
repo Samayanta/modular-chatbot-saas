@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node --loader ts-node/esm server.ts",
-    "start:api": "node --loader ts-node/esm api-server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start:api": "node dist/api-server.js",
     "start:both": "concurrently \"npm run start\" \"npm run start:api\"",
     "test": "jest",
     "db:setup": "psql -U postgres -d chatbot_saas -f database/schema.sql"
