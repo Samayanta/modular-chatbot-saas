@@ -56,7 +56,15 @@ services:
     dockerfilePath: ./Dockerfile.frontend
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://chatbot-api.onrender.com
+        fromService:
+          type: web
+          name: chatbot-api
+          property: host
+      - key: NEXT_PUBLIC_BACKEND_URL
+        fromService:
+          type: web
+          name: chatbot-api
+          property: host
       - key: NODE_ENV
         value: production
       - key: PORT
