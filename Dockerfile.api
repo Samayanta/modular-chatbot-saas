@@ -9,30 +9,25 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Build TypeScript
-RUN npm run build || echo "No build script found"
-
 # Production image
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy necessary files
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/*.ts ./
-COPY --from=builder /app/intake ./intake
-COPY --from=builder /app/queue ./queue
-COPY --from=builder /app/vector ./vector
-COPY --from=builder /app/analytics ./analytics
-COPY --from=builder /app/database ./database
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+
+# Copy source code
+COPY *.ts ./
+COPY intake ./intake
+COPY queue ./queue
+COPY vector ./vector
+COPY analytics ./analytics
+COPY llm_worker ./llm_worker
+COPY reply ./reply
+COPY database ./database
 
 # Expose port
 EXPOSE 3001
