@@ -109,10 +109,12 @@ services:
     name: chatbot-redis
     plan: free
     maxmemoryPolicy: noeviction
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
 
 databases:
   # PostgreSQL Database with pgvector
   - name: chatbot-postgres
     databaseName: chatbot_saas
-    user: postgres
     plan: free
