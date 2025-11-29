@@ -1,62 +1,47 @@
 services:
-  # PostgreSQL Database with pgvector
-  - type: pserv
-    name: chatbot-postgres
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile.postgres
-    envVars:
-      - key: POSTGRES_DB
-        value: chatbot_saas
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        generateValue: true
-
-  # Redis for BullMQ
-  - type: pserv
-    name: chatbot-redis
-    env: docker
-    plan: free
-    dockerCommand: redis-server --appendonly yes
-    image:
-      url: redis:7-alpine
-
   # REST API Server
   - type: web
     name: chatbot-api
-    env: docker
+    runtime: docker
     plan: free
+    repo: https://github.com/Samayanta/modular-chatbot-saas
     dockerfilePath: ./Dockerfile.api
     healthCheckPath: /health
     envVars:
       - key: POSTGRES_HOST
-        fromService:
-          type: pserv
+        fromDatabase:
           name: chatbot-postgres
           property: host
       - key: POSTGRES_PORT
-        value: "5432"
-      - key: POSTGRES_DB
-        value: chatbot_saas
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        fromService:
-          type: pserv
+        fromDatabase:
           name: chatbot-postgres
-          envVarKey: POSTGRES_PASSWORD
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: chatbot-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: chatbot-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: chatbot-postgres
+          property: password
       - key: REDIS_HOST
         fromService:
-          type: pserv
+          type: keyvalue
           name: chatbot-redis
           property: host
       - key: REDIS_PORT
-        value: 6379
+        fromService:
+          type: keyvalue
+          name: chatbot-redis
+          property: port
       - key: API_PORT
-        value: 3001
+        value: "3001"
       - key: PORT
-        value: 4000
+        value: "3001"
       - key: JWT_SECRET
         generateValue: true
       - key: NODE_ENV
@@ -65,33 +50,41 @@ services:
   # Message Processor Worker
   - type: worker
     name: chatbot-processor
-    env: docker
+    runtime: docker
     plan: free
+    repo: https://github.com/Samayanta/modular-chatbot-saas
     dockerfilePath: ./Dockerfile.processor
     envVars:
       - key: POSTGRES_HOST
-        fromService:
-          type: pserv
+        fromDatabase:
           name: chatbot-postgres
           property: host
       - key: POSTGRES_PORT
-        value: "5432"
-      - key: POSTGRES_DB
-        value: chatbot_saas
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        fromService:
-          type: pserv
+        fromDatabase:
           name: chatbot-postgres
-          envVarKey: POSTGRES_PASSWORD
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: chatbot-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: chatbot-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: chatbot-postgres
+          property: password
       - key: REDIS_HOST
         fromService:
-          type: pserv
+          type: keyvalue
           name: chatbot-redis
           property: host
       - key: REDIS_PORT
-        value: "6379"
+        fromService:
+          type: keyvalue
+          name: chatbot-redis
+          property: port
       - key: PORT
         value: "4000"
       - key: NODE_ENV
@@ -100,8 +93,9 @@ services:
   # Frontend Web App
   - type: web
     name: chatbot-frontend
-    env: docker
+    runtime: docker
     plan: free
+    repo: https://github.com/Samayanta/modular-chatbot-saas
     dockerfilePath: ./Dockerfile.frontend
     healthCheckPath: /
     envVars:
@@ -109,3 +103,16 @@ services:
         value: https://chatbot-api.onrender.com
       - key: NODE_ENV
         value: production
+
+  # Redis for BullMQ
+  - type: keyvalue
+    name: chatbot-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+
+databases:
+  # PostgreSQL Database with pgvector
+  - name: chatbot-postgres
+    databaseName: chatbot_saas
+    user: postgres
+    plan: free
